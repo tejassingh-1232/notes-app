@@ -2,27 +2,20 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 
-const NOTES_DIR = "C:/entries";
-const app = express();
-
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
-const NOTES_DIR = path.join(__dirname, "entries"); // ✅ Store notes inside project directory
+const NOTES_DIR = path.join(__dirname, "entries"); // ✅ Works on all OS
 
 // Middleware
 app.use(express.json());
-app.use(express.static(__dirname)); // ✅ Serve frontend
+app.use(express.static(__dirname));
 
 // Ensure `entries/` exists
 if (!fs.existsSync(NOTES_DIR)) {
     fs.mkdirSync(NOTES_DIR, { recursive: true });
 }
 
-// Save note as a **beautiful HTML file**
+// Save note as an HTML file
 app.post("/save", (req, res) => {
     const { title, content } = req.body;
     if (!title || !content) return res.status(400).send("Title and content required");
@@ -77,7 +70,7 @@ app.post("/save", (req, res) => {
         <div class="container">
             <h1>${title}</h1>
             <p>${content.replace(/\n/g, "<br>")}</p>
-            <a class="back-btn" href="/">← Back to Notes</a> <!-- ✅ Fixed the URL -->
+            <a class="back-btn" href="/">← Back to Notes</a>
         </div>
     </body>
     </html>`;
@@ -95,6 +88,5 @@ app.get("/notes", (req, res) => {
 // Serve notes
 app.use("/entries", express.static(NOTES_DIR));
 
-// Start the server ✅ Uses "0.0.0.0" for Render
+// Start the server
 app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
-
