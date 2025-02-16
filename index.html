@@ -9,7 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
@@ -85,22 +85,37 @@
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        li:hover {
+            background: #e9ecef;
+            transform: scale(1.02);
         }
 
         a {
             text-decoration: none;
             color: #007bff;
             font-weight: bold;
+            flex-grow: 1;
         }
 
         a:hover {
             text-decoration: underline;
         }
+
+        .note-icon {
+            margin-right: 10px;
+            font-size: 20px;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>📝 Notes App</h2>
+        <h2>📝 Notes App -By Tejas Singh</h2>
         <input id="title" placeholder="Note Title">
         <textarea id="content" placeholder="Write your note here..."></textarea>
         <button onclick="saveNote()">Save Note</button>
@@ -112,6 +127,8 @@
     </div>
 
     <script>
+        const BACKEND_URL = window.location.origin; // Auto-detects Render backend URL
+        //yay
         async function saveNote() {
             const title = document.getElementById("title").value.trim();
             const content = document.getElementById("content").value.trim();
@@ -120,22 +137,27 @@
                 return;
             }
 
-            await fetch("http://localhost:3000/save", { 
+            const res = await fetch(`${BACKEND_URL}/save`, { 
                 method: "POST", 
                 headers: { "Content-Type": "application/json" }, 
                 body: JSON.stringify({ title, content }) 
             });
 
-            document.getElementById("title").value = "";
-            document.getElementById("content").value = "";
-            loadNotes();
+            if (res.ok) {
+                alert("✅ Note saved!");
+                document.getElementById("title").value = "";
+                document.getElementById("content").value = "";
+                loadNotes();
+            } else {
+                alert("❌ Failed to save note.");
+            }
         }
 
         async function loadNotes() {
-            const res = await fetch("http://localhost:3000/notes");
+            const res = await fetch(`${BACKEND_URL}/notes`);
             const notes = await res.json();
             document.getElementById("notesList").innerHTML = notes.map(n => 
-                `<li><a href="http://localhost:3000${n.path}" target="_blank">${n.title}</a></li>`
+                `<li>📄 <a href="${BACKEND_URL}${n.path}" target="_blank">${n.title}</a></li>`
             ).join("");
         }
 
