@@ -15,6 +15,19 @@ if (!fs.existsSync(NOTES_DIR)) {
     fs.mkdirSync(NOTES_DIR, { recursive: true });
 }
 
+// Delete a note
+app.delete("/delete/:title", (req, res) => {
+    const title = req.params.title.replace(/\s+/g, "_");
+    const filePath = path.join(NOTES_DIR, `${title}.html`);
+
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        res.send({ message: "Note deleted!" });
+    } else {
+        res.status(404).send({ message: "Note not found!" });
+    }
+});
+
 // Save note as an HTML file
 app.post("/save", (req, res) => {
     const { title, content } = req.body;
